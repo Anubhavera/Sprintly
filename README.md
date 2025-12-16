@@ -285,4 +285,4 @@ MIT License - feel free to use this project as a reference or starting point.
 
 ---
 
-**Built with ❤️ for the Software Engineer Screening Task**
+**Built with ❤️ by Anubhav Hooda**
