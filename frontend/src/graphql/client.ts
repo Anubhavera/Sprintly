@@ -1,16 +1,10 @@
-/**
- * Apollo Client configuration for Project Management System
- */
-
 import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
 
-// HTTP Link for GraphQL endpoint
 const httpLink = new HttpLink({
   uri: '/graphql/',
   credentials: 'include',
 });
 
-// Apollo Client Cache with type policies
 const cache = new InMemoryCache({
   typePolicies: {
     Query: {
@@ -53,7 +47,6 @@ const cache = new InMemoryCache({
   },
 });
 
-// Create Apollo Client instance
 export const client = new ApolloClient({
   link: httpLink,
   cache,

@@ -55,21 +55,21 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
             className={`
               w-full ${sizeClasses[size]}
               bg-white rounded-2xl shadow-xl border border-slate-100
-              overflow-hidden
+              overflow-hidden max-h-[90vh] flex flex-col
             `}
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50">
-              <h2 className="text-xl font-bold text-slate-800 font-heading tracking-wide">{title}</h2>
+            <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-slate-100 bg-slate-50/50 shrink-0">
+              <h2 className="text-lg sm:text-xl font-bold text-slate-800 font-heading tracking-wide truncate pr-2">{title}</h2>
               <button
                 onClick={onClose}
-                className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-all"
+                className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-all shrink-0"
               >
                 <XMarkIcon className="w-5 h-5" />
               </button>
             </div>
             {/* Content */}
-            <div className="p-6">{children}</div>
+            <div className="p-4 sm:p-6 overflow-y-auto">{children}</div>
           </motion.div>
         </motion.div>
       )}

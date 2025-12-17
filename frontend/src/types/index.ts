@@ -1,8 +1,3 @@
-/**
- * TypeScript interfaces for Project Management System
- */
-
-// Organization Types
 export interface Organization {
   id: string;
   name: string;
@@ -13,7 +8,6 @@ export interface Organization {
   projectCount?: number;
 }
 
-// Project Types
 export type ProjectStatus = 'ACTIVE' | 'COMPLETED' | 'ON_HOLD' | 'CANCELLED';
 
 export interface Project {
@@ -39,7 +33,6 @@ export interface ProjectInput {
   dueDate?: string;
 }
 
-// Task Types
 export type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'DONE' | 'BLOCKED';
 export type TaskPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
 
@@ -68,7 +61,6 @@ export interface TaskInput {
   dueDate?: string;
 }
 
-// Comment Types
 export interface TaskComment {
   id: string;
   task: Task;
@@ -84,7 +76,6 @@ export interface CommentInput {
   authorEmail: string;
 }
 
-// Statistics Types
 export interface ProjectStatistics {
   projectId: string;
   projectName: string;
@@ -107,14 +98,12 @@ export interface OrganizationStatistics {
   overallCompletionRate: number;
 }
 
-// Mutation Response Types
 export interface MutationResponse<T> {
   success: boolean;
   errors: string[];
   [key: string]: T | boolean | string[];
 }
 
-// UI Helper Types
 export const PROJECT_STATUS_LABELS: Record<ProjectStatus, string> = {
   ACTIVE: 'Active',
   COMPLETED: 'Completed',

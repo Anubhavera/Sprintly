@@ -31,6 +31,8 @@ export function TaskBoard({ projectId }: TaskBoardProps) {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
+  const [draggingTaskId, setDraggingTaskId] = useState<string | null>(null);
+  const [dropTargetStatus, setDropTargetStatus] = useState<TaskStatus | null>(null);
 
   const { data, loading, error, refetch } = useQuery(GET_TASKS, {
     variables: { projectId },
@@ -68,6 +70,44 @@ export function TaskBoard({ projectId }: TaskBoardProps) {
   const handleStatusChange = async (taskId: string, newStatus: TaskStatus) => {
     await updateTask({ variables: { id: taskId, status: newStatus } });
     refetch();
+  };
+
+  // Drag and drop handlers
+  const handleDragStart = (_e: React.DragEvent<HTMLDivElement>, taskId: string) => {
+    setDraggingTaskId(taskId);
+  };
+
+  const handleDragEnd = () => {
+    setDraggingTaskId(null);
+    setDropTargetStatus(null);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>, status: TaskStatus) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setDropTargetStatus(status);
+  };
+
+  const handleDragLeave = () => {
+    setDropTargetStatus(null);
+  };
+
+  const handleDrop = async (e: React.DragEvent<HTMLDivElement>, newStatus: TaskStatus) => {
+    e.preventDefault();
+    setDropTargetStatus(null);
+
+    try {
+      const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+      const { taskId, currentStatus } = data;
+
+      if (currentStatus !== newStatus) {
+        await handleStatusChange(taskId, newStatus);
+      }
+    } catch (error) {
+      console.error('Error parsing drag data:', error);
+    }
+
+    setDraggingTaskId(null);
   };
 
   if (loading && !data) {
@@ -110,7 +150,13 @@ export function TaskBoard({ projectId }: TaskBoardProps) {
       {/* Board */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {columns.map((column) => (
-          <div key={column.status} className="space-y-4">
+          <div
+            key={column.status}
+            className="space-y-4"
+            onDragOver={(e) => handleDragOver(e, column.status)}
+            onDragLeave={handleDragLeave}
+            onDrop={(e) => handleDrop(e, column.status)}
+          >
             {/* Column Header */}
             <div className="flex items-center gap-3">
               <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${column.color}`} />
@@ -121,7 +167,12 @@ export function TaskBoard({ projectId }: TaskBoardProps) {
             </div>
 
             {/* Tasks */}
-            <div className="space-y-3 min-h-[200px]">
+            <div
+              className={`space-y-3 min-h-[200px] rounded-xl p-2 transition-all duration-200 ${dropTargetStatus === column.status
+                ? 'bg-emerald-50 border-2 border-dashed border-emerald-300 ring-2 ring-emerald-200'
+                : 'border-2 border-transparent'
+                }`}
+            >
               {tasksByStatus[column.status]?.map((task, index) => (
                 <motion.div
                   key={task.id}
@@ -129,13 +180,22 @@ export function TaskBoard({ projectId }: TaskBoardProps) {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
                 >
-                  <TaskCard task={task} onClick={() => handleTaskClick(task)} />
+                  <TaskCard
+                    task={task}
+                    onClick={() => handleTaskClick(task)}
+                    isDragging={draggingTaskId === task.id}
+                    onDragStart={handleDragStart}
+                    onDragEnd={handleDragEnd}
+                  />
                 </motion.div>
               ))}
 
               {tasksByStatus[column.status]?.length === 0 && (
-                <div className="h-32 border-2 border-dashed border-slate-300 rounded-xl flex items-center justify-center">
-                  <p className="text-slate-500 text-sm">No tasks</p>
+                <div className={`h-32 border-2 border-dashed rounded-xl flex items-center justify-center ${dropTargetStatus === column.status ? 'border-emerald-400 bg-emerald-100/50' : 'border-slate-300'
+                  }`}>
+                  <p className="text-slate-500 text-sm">
+                    {dropTargetStatus === column.status ? 'Drop here' : 'No tasks'}
+                  </p>
                 </div>
               )}
             </div>
@@ -167,6 +227,7 @@ export function TaskBoard({ projectId }: TaskBoardProps) {
         >
           <TaskDetail
             task={selectedTask}
+            projectId={projectId}
             onUpdate={handleTaskUpdated}
             onDelete={handleTaskDeleted}
             onClose={() => setShowDetailModal(false)}

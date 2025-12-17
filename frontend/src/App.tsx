@@ -1,7 +1,3 @@
-/**
- * Main App component with routing
- */
-
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ApolloProvider } from '@apollo/client/react';
 import { client } from './graphql/client';

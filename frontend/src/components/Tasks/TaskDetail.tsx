@@ -15,6 +15,7 @@ import type { Task, TaskStatus, TaskPriority } from '../../types';
 
 interface TaskDetailProps {
   task: Task;
+  projectId: string;
   onUpdate: () => void;
   onDelete: () => void;
   onClose: () => void;
@@ -34,7 +35,7 @@ const priorityLabels: Record<TaskPriority, string> = {
   URGENT: 'Urgent',
 };
 
-export function TaskDetail({ task, onUpdate, onDelete, onClose }: TaskDetailProps) {
+export function TaskDetail({ task, projectId, onUpdate, onDelete, onClose }: TaskDetailProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
@@ -52,7 +53,7 @@ export function TaskDetail({ task, onUpdate, onDelete, onClose }: TaskDetailProp
   if (isEditing) {
     return (
       <TaskForm
-        projectId={task.project.id}
+        projectId={projectId}
         task={task}
         onSuccess={handleEditSuccess}
         onCancel={() => setIsEditing(false)}
@@ -102,7 +103,7 @@ export function TaskDetail({ task, onUpdate, onDelete, onClose }: TaskDetailProp
       )}
 
       {/* Task Info */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-1">
           <p className="text-xs text-slate-500">Status</p>
           <p className="text-slate-800 font-medium">{statusLabels[task.status]}</p>

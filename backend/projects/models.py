@@ -1,23 +1,9 @@
-"""
-Django models for Project Management System.
-
-This module contains all the core data models:
-- Organization: Multi-tenant organization entity
-- Project: Organization-dependent project management
-- Task: Project-dependent task tracking
-- TaskComment: Comments on tasks for collaboration
-"""
-
 from django.db import models
 from django.utils.text import slugify
 from django.core.validators import EmailValidator
 
 
 class Organization(models.Model):
-    """
-    Multi-tenant organization entity.
-    All data is isolated at the organization level.
-    """
     name = models.CharField(max_length=100, help_text="Organization name")
     slug = models.SlugField(
         unique=True, 
@@ -46,10 +32,6 @@ class Organization(models.Model):
 
 
 class Project(models.Model):
-    """
-    Project entity belonging to an organization.
-    Contains tasks and tracks overall project status.
-    """
     class Status(models.TextChoices):
         ACTIVE = 'ACTIVE', 'Active'
         COMPLETED = 'COMPLETED', 'Completed'
@@ -82,7 +64,6 @@ class Project(models.Model):
         ordering = ['-created_at']
         verbose_name = 'Project'
         verbose_name_plural = 'Projects'
-        # Ensure unique project names within an organization
         unique_together = ['organization', 'name']
 
     def __str__(self):
@@ -90,17 +71,14 @@ class Project(models.Model):
 
     @property
     def task_count(self):
-        """Total number of tasks in this project."""
         return self.tasks.count()
 
     @property
     def completed_task_count(self):
-        """Number of completed tasks in this project."""
         return self.tasks.filter(status=Task.Status.DONE).count()
 
     @property
     def completion_rate(self):
-        """Percentage of tasks completed."""
         total = self.task_count
         if total == 0:
             return 0.0
@@ -108,10 +86,6 @@ class Project(models.Model):
 
 
 class Task(models.Model):
-    """
-    Task entity belonging to a project.
-    Represents individual work items to be completed.
-    """
     class Status(models.TextChoices):
         TODO = 'TODO', 'To Do'
         IN_PROGRESS = 'IN_PROGRESS', 'In Progress'
@@ -166,19 +140,14 @@ class Task(models.Model):
 
     @property
     def organization(self):
-        """Get the organization this task belongs to through its project."""
         return self.project.organization
 
     @property
     def comment_count(self):
-        """Number of comments on this task."""
         return self.comments.count()
 
 
 class TaskComment(models.Model):
-    """
-    Comment on a task for team collaboration.
-    """
     task = models.ForeignKey(
         Task,
         on_delete=models.CASCADE,
@@ -202,5 +171,4 @@ class TaskComment(models.Model):
 
     @property
     def organization(self):
-        """Get the organization this comment belongs to through its task."""
         return self.task.project.organization

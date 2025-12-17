@@ -1,10 +1,5 @@
-/**
- * GraphQL Mutations for Project Management System
- */
-
 import { gql } from '@apollo/client';
 
-// Organization Mutations
 export const CREATE_ORGANIZATION = gql`
   mutation CreateOrganization($name: String!, $contactEmail: String!, $slug: String) {
     createOrganization(name: $name, contactEmail: $contactEmail, slug: $slug) {
@@ -34,7 +29,6 @@ export const UPDATE_ORGANIZATION = gql`
   }
 `;
 
-// Project Mutations
 export const CREATE_PROJECT = gql`
   mutation CreateProject(
     $organizationSlug: String!
@@ -105,7 +99,6 @@ export const DELETE_PROJECT = gql`
   }
 `;
 
-// Task Mutations
 export const CREATE_TASK = gql`
   mutation CreateTask(
     $projectId: ID!
@@ -186,7 +179,6 @@ export const DELETE_TASK = gql`
   }
 `;
 
-// Comment Mutations
 export const ADD_TASK_COMMENT = gql`
   mutation AddTaskComment($taskId: ID!, $content: String!, $authorEmail: String!) {
     addTaskComment(taskId: $taskId, content: $content, authorEmail: $authorEmail) {

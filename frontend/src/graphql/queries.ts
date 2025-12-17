@@ -1,10 +1,5 @@
-/**
- * GraphQL Queries for Project Management System
- */
-
 import { gql } from '@apollo/client';
 
-// Organization Queries
 export const GET_ORGANIZATIONS = gql`
   query GetOrganizations {
     organizations {
@@ -45,7 +40,6 @@ export const GET_ORGANIZATION_STATISTICS = gql`
   }
 `;
 
-// Project Queries
 export const GET_PROJECTS = gql`
   query GetProjects($organizationSlug: String!, $status: String) {
     projects(organizationSlug: $organizationSlug, status: $status) {
@@ -99,7 +93,6 @@ export const GET_PROJECT_STATISTICS = gql`
   }
 `;
 
-// Task Queries
 export const GET_TASKS = gql`
   query GetTasks($projectId: ID!, $status: String, $priority: String) {
     tasks(projectId: $projectId, status: $status, priority: $priority) {
@@ -141,7 +134,6 @@ export const GET_TASK = gql`
   }
 `;
 
-// Comment Queries
 export const GET_TASK_COMMENTS = gql`
   query GetTaskComments($taskId: ID!) {
     taskComments(taskId: $taskId) {

@@ -1,15 +1,13 @@
-/**
- * Main Layout component with modern glass navigation
- */
-
-import { ReactNode } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Squares2X2Icon,
   FolderIcon,
   Cog6ToothIcon,
   BuildingOfficeIcon,
+  Bars3Icon,
+  XMarkIcon,
 } from '@heroicons/react/24/outline';
 
 interface LayoutProps {
@@ -19,6 +17,19 @@ interface LayoutProps {
 
 export function Layout({ children, organizationSlug }: LayoutProps) {
   const location = useLocation();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    setIsSidebarOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsSidebarOpen(false);
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, []);
 
   const navItems = [
     { path: '/', icon: Squares2X2Icon, label: 'Dashboard' },
@@ -27,9 +38,50 @@ export function Layout({ children, organizationSlug }: LayoutProps) {
 
   return (
     <div className="h-screen flex overflow-hidden bg-slate-50">
-      {/* Floating Sidebar (Light Glass) */}
-      <aside className="w-72 m-6 flex flex-col glass-card bg-white/80 border-white/60">
-        {/* Brand */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 h-16 glass-card rounded-none border-x-0 border-t-0 flex items-center justify-between px-4">
+        <button
+          onClick={() => setIsSidebarOpen(true)}
+          className="p-2 text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-all"
+          aria-label="Open menu"
+        >
+          <Bars3Icon className="w-6 h-6" />
+        </button>
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+            <BuildingOfficeIcon className="w-4 h-4 text-white" />
+          </div>
+          <span className="font-bold text-slate-800 font-heading">Sprintly</span>
+        </div>
+        <div className="w-10" />
+      </div>
+
+      <AnimatePresence>
+        {isSidebarOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsSidebarOpen(false)}
+            className="lg:hidden fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-sm"
+          />
+        )}
+      </AnimatePresence>
+
+      <aside
+        className={`
+          fixed inset-y-0 left-0 z-50 w-72 flex flex-col glass-card bg-white/80 border-white/60 m-0 rounded-none
+          lg:relative lg:m-6 lg:rounded-3xl
+          transform transition-transform duration-300 ease-out
+          ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        `}
+      >
+        <button
+          onClick={() => setIsSidebarOpen(false)}
+          className="lg:hidden absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-all"
+          aria-label="Close menu"
+        >
+          <XMarkIcon className="w-5 h-5" />
+        </button>
         <div className="p-8 pb-6">
           <Link to="/" className="flex items-center gap-4 group">
             <div className="relative">
@@ -44,7 +96,6 @@ export function Layout({ children, organizationSlug }: LayoutProps) {
           </Link>
         </div>
 
-        {/* Navigation */}
         <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto custom-scrollbar">
           <p className="px-4 text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 font-heading">Menu</p>
           {navItems.map((item) => {
@@ -83,7 +134,6 @@ export function Layout({ children, organizationSlug }: LayoutProps) {
           })}
         </nav>
 
-        {/* User / Footer */}
         <div className="p-4 mt-auto">
           <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
             <div className="flex items-center gap-3">
@@ -102,9 +152,8 @@ export function Layout({ children, organizationSlug }: LayoutProps) {
         </div>
       </aside>
 
-      {/* Main Content Area */}
-      <main className="flex-1 overflow-auto p-6 pl-0">
-        <div className="h-full glass-card overflow-auto p-8 custom-scrollbar">
+      <main className="flex-1 overflow-auto p-4 pt-20 lg:p-6 lg:pt-6 lg:pl-0">
+        <div className="h-full glass-card overflow-auto p-4 sm:p-6 lg:p-8 custom-scrollbar">
           {children}
         </div>
       </main>

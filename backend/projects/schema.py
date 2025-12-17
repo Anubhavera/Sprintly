@@ -1,13 +1,3 @@
-"""
-GraphQL schema for Projects app.
-
-Contains all queries and mutations for:
-- Organizations
-- Projects
-- Tasks
-- Task Comments
-"""
-
 import graphene
 from graphene_django.filter import DjangoFilterConnectionField
 from django.db.models import Count, Q
@@ -20,14 +10,7 @@ from .types import (
 )
 
 
-# ============================================================================
-# Queries
-# ============================================================================
-
 class Query(graphene.ObjectType):
-    """Root query for Projects app."""
-    
-    # Organization queries
     organizations = graphene.List(OrganizationType)
     organization = graphene.Field(
         OrganizationType,
@@ -35,7 +18,6 @@ class Query(graphene.ObjectType):
         slug=graphene.String()
     )
     
-    # Project queries
     projects = graphene.List(
         ProjectType,
         organization_slug=graphene.String(required=True),
@@ -43,7 +25,6 @@ class Query(graphene.ObjectType):
     )
     project = graphene.Field(ProjectType, id=graphene.ID(required=True))
     
-    # Task queries
     tasks = graphene.List(
         TaskType,
         project_id=graphene.ID(required=True),
@@ -52,13 +33,11 @@ class Query(graphene.ObjectType):
     )
     task = graphene.Field(TaskType, id=graphene.ID(required=True))
     
-    # Comment queries
     task_comments = graphene.List(
         TaskCommentType,
         task_id=graphene.ID(required=True)
     )
     
-    # Statistics queries
     project_statistics = graphene.Field(
         ProjectStatisticsType,
         project_id=graphene.ID(required=True)
@@ -68,7 +47,6 @@ class Query(graphene.ObjectType):
         organization_slug=graphene.String(required=True)
     )
     
-    # Organization resolvers
     def resolve_organizations(self, info):
         return Organization.objects.all()
     
@@ -79,7 +57,6 @@ class Query(graphene.ObjectType):
             return Organization.objects.filter(slug=slug).first()
         return None
     
-    # Project resolvers (with organization isolation)
     def resolve_projects(self, info, organization_slug, status=None):
         queryset = Project.objects.filter(organization__slug=organization_slug)
         if status:
@@ -89,7 +66,6 @@ class Query(graphene.ObjectType):
     def resolve_project(self, info, id):
         return Project.objects.filter(id=id).first()
     
-    # Task resolvers
     def resolve_tasks(self, info, project_id, status=None, priority=None):
         queryset = Task.objects.filter(project_id=project_id)
         if status:
@@ -101,11 +77,9 @@ class Query(graphene.ObjectType):
     def resolve_task(self, info, id):
         return Task.objects.filter(id=id).first()
     
-    # Comment resolvers
     def resolve_task_comments(self, info, task_id):
         return TaskComment.objects.filter(task_id=task_id)
     
-    # Statistics resolvers
     def resolve_project_statistics(self, info, project_id):
         project = Project.objects.filter(id=project_id).first()
         if not project:
@@ -139,7 +113,6 @@ class Query(graphene.ObjectType):
         active_projects = projects.filter(status=Project.Status.ACTIVE).count()
         completed_projects = projects.filter(status=Project.Status.COMPLETED).count()
         
-        # Aggregate task statistics
         total_tasks = Task.objects.filter(project__organization=org).count()
         completed_tasks = Task.objects.filter(
             project__organization=org,
@@ -158,15 +131,7 @@ class Query(graphene.ObjectType):
         )
 
 
-# ============================================================================
-# Mutations
-# ============================================================================
-
-# --- Organization Mutations ---
-
 class CreateOrganization(graphene.Mutation):
-    """Create a new organization."""
-    
     class Arguments:
         name = graphene.String(required=True)
         contact_email = graphene.String(required=True)
@@ -189,8 +154,6 @@ class CreateOrganization(graphene.Mutation):
 
 
 class UpdateOrganization(graphene.Mutation):
-    """Update an existing organization."""
-    
     class Arguments:
         id = graphene.ID(required=True)
         name = graphene.String()
@@ -215,11 +178,7 @@ class UpdateOrganization(graphene.Mutation):
             return UpdateOrganization(organization=None, success=False, errors=[str(e)])
 
 
-# --- Project Mutations ---
-
 class CreateProject(graphene.Mutation):
-    """Create a new project within an organization."""
-    
     class Arguments:
         organization_slug = graphene.String(required=True)
         name = graphene.String(required=True)
@@ -249,8 +208,6 @@ class CreateProject(graphene.Mutation):
 
 
 class UpdateProject(graphene.Mutation):
-    """Update an existing project."""
-    
     class Arguments:
         id = graphene.ID(required=True)
         name = graphene.String()
@@ -282,8 +239,6 @@ class UpdateProject(graphene.Mutation):
 
 
 class DeleteProject(graphene.Mutation):
-    """Delete a project."""
-    
     class Arguments:
         id = graphene.ID(required=True)
     
@@ -301,11 +256,7 @@ class DeleteProject(graphene.Mutation):
             return DeleteProject(success=False, errors=[str(e)])
 
 
-# --- Task Mutations ---
-
 class CreateTask(graphene.Mutation):
-    """Create a new task within a project."""
-    
     class Arguments:
         project_id = graphene.ID(required=True)
         title = graphene.String(required=True)
@@ -340,8 +291,6 @@ class CreateTask(graphene.Mutation):
 
 
 class UpdateTask(graphene.Mutation):
-    """Update an existing task."""
-    
     class Arguments:
         id = graphene.ID(required=True)
         title = graphene.String()
@@ -380,8 +329,6 @@ class UpdateTask(graphene.Mutation):
 
 
 class DeleteTask(graphene.Mutation):
-    """Delete a task."""
-    
     class Arguments:
         id = graphene.ID(required=True)
     
@@ -399,11 +346,7 @@ class DeleteTask(graphene.Mutation):
             return DeleteTask(success=False, errors=[str(e)])
 
 
-# --- Comment Mutations ---
-
 class AddTaskComment(graphene.Mutation):
-    """Add a comment to a task."""
-    
     class Arguments:
         task_id = graphene.ID(required=True)
         content = graphene.String(required=True)
@@ -429,8 +372,6 @@ class AddTaskComment(graphene.Mutation):
 
 
 class UpdateTaskComment(graphene.Mutation):
-    """Update an existing comment."""
-    
     class Arguments:
         id = graphene.ID(required=True)
         content = graphene.String(required=True)
@@ -452,8 +393,6 @@ class UpdateTaskComment(graphene.Mutation):
 
 
 class DeleteTaskComment(graphene.Mutation):
-    """Delete a comment."""
-    
     class Arguments:
         id = graphene.ID(required=True)
     
@@ -471,28 +410,18 @@ class DeleteTaskComment(graphene.Mutation):
             return DeleteTaskComment(success=False, errors=[str(e)])
 
 
-# ============================================================================
-# Mutation Root
-# ============================================================================
-
 class Mutation(graphene.ObjectType):
-    """Root mutation for Projects app."""
-    
-    # Organization mutations
     create_organization = CreateOrganization.Field()
     update_organization = UpdateOrganization.Field()
     
-    # Project mutations
     create_project = CreateProject.Field()
     update_project = UpdateProject.Field()
     delete_project = DeleteProject.Field()
     
-    # Task mutations
     create_task = CreateTask.Field()
     update_task = UpdateTask.Field()
     delete_task = DeleteTask.Field()
     
-    # Comment mutations
     add_task_comment = AddTaskComment.Field()
     update_task_comment = UpdateTaskComment.Field()
     delete_task_comment = DeleteTaskComment.Field()

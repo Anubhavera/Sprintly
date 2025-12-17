@@ -1,10 +1,3 @@
-"""
-GraphQL types for Project Management System.
-
-Defines GraphQL types that map to Django models with proper field
-exposure and computed properties.
-"""
-
 import graphene
 from graphene_django import DjangoObjectType
 from django_filters import FilterSet, CharFilter, ChoiceFilter
@@ -12,12 +5,7 @@ from django_filters import FilterSet, CharFilter, ChoiceFilter
 from .models import Organization, Project, Task, TaskComment
 
 
-# ============================================================================
-# Filters
-# ============================================================================
-
 class ProjectFilter(FilterSet):
-    """Filter for Project queries."""
     status = ChoiceFilter(choices=Project.Status.choices)
     name = CharFilter(lookup_expr='icontains')
     
@@ -27,7 +15,6 @@ class ProjectFilter(FilterSet):
 
 
 class TaskFilter(FilterSet):
-    """Filter for Task queries."""
     status = ChoiceFilter(choices=Task.Status.choices)
     priority = ChoiceFilter(choices=Task.Priority.choices)
     title = CharFilter(lookup_expr='icontains')
@@ -37,12 +24,7 @@ class TaskFilter(FilterSet):
         fields = ['status', 'priority', 'project', 'assignee_email', 'title']
 
 
-# ============================================================================
-# GraphQL Types
-# ============================================================================
-
 class OrganizationType(DjangoObjectType):
-    """GraphQL type for Organization."""
     project_count = graphene.Int()
     
     class Meta:
@@ -54,7 +36,6 @@ class OrganizationType(DjangoObjectType):
 
 
 class ProjectType(DjangoObjectType):
-    """GraphQL type for Project."""
     task_count = graphene.Int()
     completed_task_count = graphene.Int()
     completion_rate = graphene.Float()
@@ -78,7 +59,6 @@ class ProjectType(DjangoObjectType):
 
 
 class TaskType(DjangoObjectType):
-    """GraphQL type for Task."""
     comment_count = graphene.Int()
     
     class Meta:
@@ -94,19 +74,12 @@ class TaskType(DjangoObjectType):
 
 
 class TaskCommentType(DjangoObjectType):
-    """GraphQL type for TaskComment."""
-    
     class Meta:
         model = TaskComment
         fields = ['id', 'task', 'content', 'author_email', 'created_at', 'updated_at']
 
 
-# ============================================================================
-# Statistics Types
-# ============================================================================
-
 class ProjectStatisticsType(graphene.ObjectType):
-    """Statistics for a single project."""
     project_id = graphene.ID()
     project_name = graphene.String()
     total_tasks = graphene.Int()
@@ -118,7 +91,6 @@ class ProjectStatisticsType(graphene.ObjectType):
 
 
 class OrganizationStatisticsType(graphene.ObjectType):
-    """Statistics for an organization."""
     organization_id = graphene.ID()
     organization_name = graphene.String()
     total_projects = graphene.Int()

@@ -98,12 +98,12 @@ export function ProjectDetail() {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-start justify-between"
+          className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4"
         >
-          <div>
-            <div className="flex items-center gap-4 mb-2">
-              <h1 className="text-3xl font-bold text-slate-800">{project.name}</h1>
-              <span className={`status-badge ${statusStyles[project.status as ProjectStatus]}`}>
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-3 mb-2">
+              <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 break-words">{project.name}</h1>
+              <span className={`status-badge ${statusStyles[project.status as ProjectStatus]} shrink-0`}>
                 {statusLabels[project.status as ProjectStatus]}
               </span>
             </div>
@@ -112,7 +112,7 @@ export function ProjectDetail() {
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <Button
               variant="secondary"
               size="sm"
