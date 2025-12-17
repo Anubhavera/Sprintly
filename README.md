@@ -252,7 +252,6 @@ npm run build  # This also runs type checking
 ### Future Improvements
 - [ ] JWT authentication with user management
 - [ ] Real-time updates via WebSocket subscriptions
-- [ ] Drag-and-drop task reordering
 - [ ] File attachments for tasks
 - [ ] Email notifications
 - [ ] Advanced search and filtering
