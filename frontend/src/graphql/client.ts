@@ -1,8 +1,11 @@
 import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
 
 const httpLink = new HttpLink({
-  uri: '/graphql/',
+  uri: import.meta.env.VITE_API_URL || '/graphql/',
   credentials: 'include',
+  fetchOptions: {
+    mode: 'cors',
+  },
 });
 
 const cache = new InMemoryCache({

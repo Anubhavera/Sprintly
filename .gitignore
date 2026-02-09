@@ -1,0 +1,27 @@
+# General
+.DS_Store
+*.log
+.idea/
+.vscode/
+
+# Python / Django (Backend)
+backend/venv/
+backend/__pycache__/
+backend/*.pyc
+backend/staticfiles/
+backend/media/
+backend/.env
+backend/db.sqlite3
+*.py[cod]
+*$py.class
+
+# Node / React (Frontend)
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/.env
+frontend/.env.local
+node_modules/
+
+# Docker
+.docker_data/
